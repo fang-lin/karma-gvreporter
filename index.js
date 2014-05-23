@@ -69,7 +69,7 @@ var HTMLReporter = function (baseReporterDecorator, config, emitter, logger, hel
                 } catch (err) {
                     log.error(err.message);
                 }
-                var output = outputPath.replace(':browser', report.browser)
+                var output = outputPath.replace(':browser', report.browser.split(' ')[0])
                     .replace(':id', report.id)
                     .replace(':timestamp', report.timestamp.getTime());
 
