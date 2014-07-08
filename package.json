@@ -1,6 +1,6 @@
 {
     "name": "karma-gvreporter",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "description": "A Karma plugin. Report results in html template format.",
     "main": "index.js",
     "dependencies": {
