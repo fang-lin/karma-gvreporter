@@ -72,14 +72,13 @@ var HTMLReporter = function (baseReporterDecorator, config, emitter, logger, hel
                 var output = outputPath.replace(':browser', report.browser.split(' ')[0])
                     .replace(':id', report.id)
                     .replace(':timestamp', report.timestamp.getTime());
-                output = basePathResolve(output);
-                helper.mkdirIfNotExists(output, function () {
-                    fs.writeFile(output, html, function (err) {
+                helper.mkdirIfNotExists(path.dirname(output), function () {
+                    fs.writeFile(basePathResolve(output), html, function (err) {
                         if (err) {
                             log.error(err.message);
                         } else {
                             if (!--pendingCount) {
-                                log.info('Reports written to "%s".', outputPath);
+                                log.info('Reports written to "%s".', basePathResolve(outputPath));
                             }
                         }
                     });
