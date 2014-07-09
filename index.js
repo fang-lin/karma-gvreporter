@@ -7,6 +7,7 @@ var HTMLReporter = function (baseReporterDecorator, config, emitter, logger, hel
 
     var defaultTemplatePath = path.resolve(__dirname, 'template.html'),
         outputPath = config.htmlReporter.outputPath,
+        fileName = config.htmlReporter.fileName,
         template = config.htmlReporter.template ? fs.readFileSync(config.htmlReporter.template, 'utf8') : fs.readFileSync(defaultTemplatePath, 'utf8');
     reports = {},
         log = logger.create('karam-gvreporter'),
@@ -69,16 +70,18 @@ var HTMLReporter = function (baseReporterDecorator, config, emitter, logger, hel
                 } catch (err) {
                     log.error(err.message);
                 }
-                var output = outputPath.replace(':browser', report.browser.split(' ')[0])
+                fileName = fileName.replace(':browser', report.browser.split(' ')[0])
                     .replace(':id', report.id)
                     .replace(':timestamp', report.timestamp.getTime());
-                helper.mkdirIfNotExists(path.dirname(output), function () {
-                    fs.writeFile(basePathResolve(output), html, function (err) {
+                outputPath = basePathResolve(outputPath);
+                var fullFileName = path.join(outputPath, fileName);
+                helper.mkdirIfNotExists(outputPath, function () {
+                    fs.writeFile(fullFileName, html, function (err) {
                         if (err) {
                             log.error(err.message);
                         } else {
                             if (!--pendingCount) {
-                                log.info('Reports written to "%s".', basePathResolve(outputPath));
+                                log.info('Reports written to "%s".', fullFileName);
                             }
                         }
                     });
