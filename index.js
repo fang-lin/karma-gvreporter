@@ -1,3 +1,4 @@
+var os = require('os');
 var path = require('path');
 var fs = require('fs');
 var _ = require('underscore');
@@ -6,6 +7,7 @@ var HTMLReporter = function (baseReporterDecorator, config, emitter, logger, hel
 
     var defaultTemplatePath = path.resolve(__dirname, 'template.html');
     var outputPath = config.htmlReporter.outputPath;
+    var fileName = config.htmlReporter.fileName;
     var template = config.htmlReporter.template ? fs.readFileSync(config.htmlReporter.template, 'utf8') : fs.readFileSync(defaultTemplatePath, 'utf8');
     var reports = {};
     var log = logger.create('karam-gvreporter');
@@ -68,24 +70,27 @@ var HTMLReporter = function (baseReporterDecorator, config, emitter, logger, hel
                 } catch (err) {
                     log.error(err.message);
                 }
-                var output = outputPath.replace(':browser', report.browser.split(' ')[0])
+                fileName = fileName.replace(':browser', report.browser.split(' ')[0])
                     .replace(':id', report.id)
                     .replace(':timestamp', report.timestamp.getTime());
+                outputPath = basePathResolve(outputPath);
 
-                output = basePathResolve(output);
-                helper.mkdirIfNotExists(output, function () {
-                    fs.writeFile(output, html, function (err) {
+                helper.mkdirIfNotExists(outputPath, function () {
+                    var fullFileName = path.join(outputPath, fileName);
+
+                    fs.writeFile(fullFileName, html, function (err) {
                         if (err) {
                             log.error(err.message);
                         } else {
                             if (!--pendingCount) {
-                                log.info('Reports written to "%s".', basePathResolve(outputPath));
+                                log.info('Reports written to "%s".', fullFileName);
                             }
                         }
                     });
                 });
             }
         }
+
     };
 };
 
