@@ -1,16 +1,15 @@
-var os = require('os');
 var path = require('path');
 var fs = require('fs');
 var _ = require('underscore');
 
 var HTMLReporter = function (baseReporterDecorator, config, emitter, logger, helper, formatError) {
 
-    var defaultTemplatePath = path.resolve(__dirname, 'template.html'),
-        outputPath = config.htmlReporter.outputPath,
-        template = config.htmlReporter.template ? fs.readFileSync(config.htmlReporter.template, 'utf8') : fs.readFileSync(defaultTemplatePath, 'utf8');
-        reports = {},
-        log = logger.create('karam-gvreporter'),
-        pendingCount = 0;
+    var defaultTemplatePath = path.resolve(__dirname, 'template.html');
+    var outputPath = config.htmlReporter.outputPath;
+    var template = config.htmlReporter.template ? fs.readFileSync(config.htmlReporter.template, 'utf8') : fs.readFileSync(defaultTemplatePath, 'utf8');
+    var reports = {};
+    var log = logger.create('karam-gvreporter');
+    var pendingCount = 0;
 
     baseReporterDecorator(this);
 
@@ -73,18 +72,20 @@ var HTMLReporter = function (baseReporterDecorator, config, emitter, logger, hel
                     .replace(':id', report.id)
                     .replace(':timestamp', report.timestamp.getTime());
 
-                fs.writeFile(basePathResolve(output), html, function (err) {
-                    if (err) {
-                        log.error(err.message);
-                    } else {
-                        if (!--pendingCount) {
-                            log.info('Reports written to "%s".', basePathResolve(outputPath));
+                output = basePathResolve(output);
+                helper.mkdirIfNotExists(output, function () {
+                    fs.writeFile(output, html, function (err) {
+                        if (err) {
+                            log.error(err.message);
+                        } else {
+                            if (!--pendingCount) {
+                                log.info('Reports written to "%s".', basePathResolve(outputPath));
+                            }
                         }
-                    }
+                    });
                 });
             }
         }
-
     };
 };
 
